@@ -1,14 +1,23 @@
 require "sqlite3"
+require 'lrucache'
 
 module Linkly
   module Mementos
     class Sqlite3
       def initialize
-        #create_db
+        create_db
+
+        @lrucache = LRUCache.new(:ttl => 3600)
       end
 
       def memorize(domain, url, attribute, value)
-        p [domain, url, attribute, value]
+        unless value.nil? || value.to_s.empty?
+          unless exists?(url)
+            store(domain, attribute, value)
+          end
+
+          value = nil if too_many?(domain, attribute, value)
+        end
 
         value
       end
@@ -18,36 +27,76 @@ module Linkly
         @db = SQLite3::Database.new(File.join(ENV['HOME'],".linkly","memento.db"))
 
         @db.execute <<-SQL
-          CREATE TABLE IF NOT EXISTS memento (
+          CREATE TABLE IF NOT EXISTS urls (
             url VARCHAR(2048) NOT NULL PRIMARY KEY,
-            created_at DATE NOT NULL DEFAULT CURRENT_DATE,
-            value text
+            created_at DATE NOT NULL DEFAULT CURRENT_DATE
           );
         SQL
 
         @db.execute <<-SQL
           CREATE INDEX IF NOT EXISTS idx_urls_created_at ON urls (created_at);
         SQL
+
+        @db.execute <<-SQL
+          CREATE TABLE IF NOT EXISTS attributes (
+            domain VARCHAR(255) NOT NULL,
+            attribute VARCHAR(255) NOT NULL,
+            created_at DATE NOT NULL DEFAULT CURRENT_DATE,
+            value text
+          );
+        SQL
+
+        @db.execute <<-SQL
+          CREATE INDEX IF NOT EXISTS idx_attributes_domains_attribute ON attributes (domain, attribute);
+        SQL
+
+        @db.execute <<-SQL
+          CREATE INDEX IF NOT EXISTS idx_attributes_domains_created_at ON attributes (domain, created_at);
+        SQL
       end
 
-      def load_from_cache(url)
-        data = nil
+      def store(domain, attribute, value)
+        @db.execute "INSERT INTO attributes (domain, attribute, value) values (?, ?, ?)", [domain, attribute, value]
+      end
 
-        resultset = @db.execute("select value from urls where url=?", [url])
-        if row = resultset.first
-          data = JSON.parse(row[0])
+      def too_many?(domain, attribute, current_value)
+        too_many =  false
+        count = -1
+
+        @db.execute("select domain, attribute, value from attributes where domain=? and attribute=?", [domain, attribute]).each do |row|
+          domain, attribute, value = row
+
+          count += 1 if current_value == value
+
+          if count > 7
+            too_many = true
+          end
         end
 
         if rand(100) < 10
-          @db.execute("DELETE FROM urls WHERE created_at < date('now', '-2 days');")
+          @db.execute("DELETE FROM attributes WHERE domain = ? and created_at < date('now', '-7 days');", [domain])
         end
 
-        data
+        too_many
       end
 
-      def write_to_cache(url, value)
-        json = JSON.dump({:url => url, :value => value})
-        @db.execute "INSERT INTO urls (url, value) values (?, ?)", [url, json]
+      def exists?(url)
+        @lrucache.fetch(url) do
+          exists = false
+
+          resultset = @db.execute("select url from urls where url=?", [url])
+          if resultset.first
+            exists = true
+          else
+            @db.execute "INSERT INTO urls (url) values (?)", [url]
+          end
+
+          if rand(100) < 10
+            @db.execute("DELETE FROM urls WHERE created_at < date('now', '-31 days');")
+          end
+
+          exists
+        end
       end
     end
   end

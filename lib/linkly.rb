@@ -6,7 +6,6 @@ require "hotwater"
 require 'json'
 
 require_relative 'linkly/http/helper'
-require_relative 'linkly/http/content_extractor'
 require_relative 'linkly/http/response'
 
 require_relative 'linkly/document'

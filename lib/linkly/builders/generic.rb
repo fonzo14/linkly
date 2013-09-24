@@ -53,6 +53,8 @@ module Linkly
                         'image' => image
                     })
 
+        p [og, twitter]
+
         doc = Document.new
         doc.url = find_url(url, meta, og, twitter)
         doc.title = find_title(meta, og, twitter)
@@ -72,11 +74,11 @@ module Linkly
       end
 
       def find_title(meta, og, twitter)
-        to_text([og['title'], twitter['title'], meta['title']].compact.reject { |desc| desc.to_s.empty? }.first)
+        to_text([og['title'], twitter['title'], meta['title']].compact.reject { |text| text.to_s.empty? }.first)
       end
 
       def find_text(title, meta, og, twitter)
-        [og['description'], twitter['description'], meta['description']].compact.reject { |desc| desc.to_s.empty? || desc.to_s.size < 10 }.map do |text|
+        [og['description'], twitter['description'], meta['description']].compact.reject { |text| text.to_s.empty? || text.to_s.size < 10 }.map do |text|
           to_text(text)
         end.reject { |text| Hotwater.jaro_winkler_distance(title, text) > 0.95 }.first
       end
