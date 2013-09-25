@@ -47,11 +47,7 @@ module Linkly
         SQL
 
         @db.execute <<-SQL
-          CREATE INDEX IF NOT EXISTS idx_attributes_domains_attribute ON attributes (domain, attribute);
-        SQL
-
-        @db.execute <<-SQL
-          CREATE INDEX IF NOT EXISTS idx_attributes_domains_created_at ON attributes (domain, created_at);
+          CREATE INDEX IF NOT EXISTS idx_attributes_domains_attribute_created_at ON attributes (domain, attribute, created_at);
         SQL
       end
 
@@ -68,13 +64,14 @@ module Linkly
 
           count += 1 if current_value == value
 
-          if count > 7
+          if count > 4
             too_many = true
           end
         end
 
-        if rand(100) < 10
-          @db.execute("DELETE FROM attributes WHERE domain = ? and created_at < date('now', '-7 days');", [domain])
+        resultset = @db.execute("select created_at from attributes where domain=? and attribute=? order by created_at desc limit 25,1;", [domain, attribute])
+        if row = resultset.first
+          @db.execute("DELETE FROM attributes WHERE domain = ? AND attribute = ? AND created_at < ?", [domain, attribute, row[0]])
         end
 
         too_many
@@ -92,7 +89,7 @@ module Linkly
           end
 
           if rand(100) < 10
-            @db.execute("DELETE FROM urls WHERE created_at < date('now', '-31 days');")
+            @db.execute("DELETE FROM urls WHERE created_at < date('now', '-7 days');")
           end
 
           exists

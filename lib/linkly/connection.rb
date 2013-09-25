@@ -1,6 +1,5 @@
 module Linkly
   class Connection
-    include ::Linkly::HTTP::Helper
 
     def initialize(opts)
       opts = {

@@ -12,6 +12,8 @@ EM.synchrony do
     http://www.lequipe.fr/Football/Actualites/Pirlo-averti-par-conte/403646
     http://www.lequipe.fr/Football/Actualites/Van-persie-de-retour-samedi/403632
     http://www.lequipe.fr/Football/Actualites/Ancelotti-bale-sera-la-samedi/403614
+    http://www.lequipe.fr/Football/Actualites/-on-tire-dans-le-bon-sens/403803
+    http://www.lequipe.fr/Football/Actualites/Messi-polemique-avec-la-presse/403825
   )
 
   linkly = Linkly.new :cache => :sqlite3, :memento => :sqlite3

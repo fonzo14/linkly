@@ -13,6 +13,7 @@ module Linkly
         url = c18n(url)
 
         title = html.at_css("head title").text rescue nil
+
         title = @memento.memorize(domain, url, "head:title", title)
 
         canonical = c18n extract_link(html, "canonical")
@@ -52,8 +53,6 @@ module Linkly
                         'title' => title,
                         'image' => image
                     })
-
-        p [og, twitter]
 
         doc = Document.new
         doc.url = find_url(url, meta, og, twitter)

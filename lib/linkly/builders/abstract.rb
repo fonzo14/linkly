@@ -6,10 +6,10 @@ module Linkly
       protected
       def parse(url, body)
         begin
-          Nokogiri::parse(body, url)
+          Nokogiri::HTML(body, url)
         rescue Exception
           body.encode!('UTF-8', 'UTF-8', :invalid => :replace)
-          Nokogiri::parse(body, url)
+          Nokogiri::HTML(body, url)
         end
       end
 
