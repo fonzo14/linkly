@@ -1,12 +1,7 @@
 module Linkly
   class Document
-    attr_reader :id, :url, :title, :text
-    attr_accessor :image, :type, :platform
-
-    def url=(u)
-      @url = u
-      @id = Digest::MD5.hexdigest(@url).to_i(16)
-    end
+    attr_reader :title, :text
+    attr_accessor :image, :type, :platform, :url
 
     def title=(t)
       @title = truncate(t.to_s, 255)
@@ -18,8 +13,8 @@ module Linkly
 
     def to_h
       {
-          :id => id,
-          :url => url,
+          :id => url.id,
+          :url => url.url,
           :title => title,
           :text => text,
           :image => image,

@@ -10,12 +10,12 @@ module Linkly
       @generic = Linkly::Builders::Generic.new(memento)
     end
 
-    def build(url, body)
-      pattern = BUILDERS.keys.find { |r| url =~ r }
+    def build(response)
+      pattern = BUILDERS.keys.find { |r| response.url.url =~ r }
 
       builder = pattern ? BUILDERS[pattern] : @generic
 
-      document = builder.build(url, body)
+      document = builder.build(response)
       document
     end
 

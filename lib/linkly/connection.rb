@@ -21,19 +21,27 @@ module Linkly
     end
 
     def get_document(url)
-      @cache.fetch(url) do |url|
-        document = nil
+      document = nil
 
-        response = @http_client.get(url)
+      url = Url.new(url)
 
-        if response.success?
-          document = @builder.build(response.url, response.body).to_h
-        else
-         puts "#{response.code}: #{url}"
+      if url.valid?
+        document = @cache.fetch(url.canonical) do |canonical|
+          document = nil
+
+          response = @http_client.get(url.url)
+
+          if response.success?
+            document = @builder.build(response).to_h
+          else
+           puts "#{response.code}: #{url.url}"
+          end
+
+          document
         end
-
-        document
       end
+
+      document
     end
 
     private

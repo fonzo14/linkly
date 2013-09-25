@@ -5,7 +5,6 @@ module Linkly
   module HTTP
     module Clients
       class Synchrony
-        include HTTP::Helper
 
         def initialize
           @request_options = {
@@ -17,7 +16,6 @@ module Linkly
           http = ::EventMachine::HttpRequest.new(url).get(@request_options)
 
           last_url = http.last_effective_url ? http.last_effective_url.to_s : url
-          last_url = c18n(last_url)
 
           HTTP::Response.new(last_url, http.response, http.response_header.status, http.response_header)
         end

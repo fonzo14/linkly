@@ -3,8 +3,8 @@ module Linkly
     class Response
       attr_reader :url, :body, :code, :headers
 
-      def initialize(uri, body, code, headers={})
-        @url, @body, @code, @headers = uri.to_s, body, code.to_i, headers
+      def initialize(url, body, code, headers={})
+        @url, @body, @code, @headers = Linkly::Url.new(url), body, code.to_i, headers
       end
 
       def success?
@@ -16,7 +16,7 @@ module Linkly
       end
 
       def to_s
-        [url, code].join(' : ')
+        [url.url, code].join(' : ')
       end
     end
   end

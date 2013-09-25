@@ -1,10 +1,9 @@
 module Linkly
   module Builders
     class Instagram < Abstract
-      include HTTP::Helper
 
-      def build(url, body)
-          html = parse(url, body)
+      def build(response)
+        html = parse(response.url.url, response.body)
 
         og = %w{url title description image}.inject({}) do |h, property|
           attribute = "og:#{property}"
@@ -13,7 +12,7 @@ module Linkly
         end
 
         doc = Document.new
-        doc.url = og['url']
+        doc.url = Url.new(og['url'], :force => true)
         doc.image = og['image']
 
         doc.type = :image

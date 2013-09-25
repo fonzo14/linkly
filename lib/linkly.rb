@@ -8,6 +8,7 @@ require 'json'
 require_relative 'linkly/http/helper'
 require_relative 'linkly/http/response'
 
+require_relative 'linkly/url'
 require_relative 'linkly/document'
 require_relative 'linkly/builders/abstract'
 require_relative 'linkly/builders/generic'

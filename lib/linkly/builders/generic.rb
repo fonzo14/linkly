@@ -5,24 +5,20 @@ module Linkly
         @memento = memento
       end
 
-      def build(url, body)
-        html = parse(url, body)
-
-        domain = domain(url)
-
-        url = c18n(url)
+      def build(response)
+        html = parse(response.url.url, response.body)
 
         title = html.at_css("head title").text rescue nil
 
-        title = @memento.memorize(domain, url, "head:title", title)
+        title = @memento.memorize(response.url.domain, response.url.canonical, "head:title", title)
 
-        canonical = c18n extract_link(html, "canonical")
+        canonical = Url.new(extract_link(html, "canonical"))
 
         image = extract_link(html, "image_src")
 
         meta = %w{description}.inject({}) do |h, property|
           h[property] = extract_meta(html, property)
-          h[property] = @memento.memorize(domain, url, "meta:#{property}", h[property])
+          h[property] = @memento.memorize(response.url.domain, response.url.canonical, "meta:#{property}", h[property])
           h
         end
 
@@ -30,23 +26,23 @@ module Linkly
           attribute = "og:#{property}"
           h[property] = extract_meta(html, attribute)
           if property != 'url'
-            h[property] = @memento.memorize(domain, url, attribute, h[property])
+            h[property] = @memento.memorize(response.url.domain, response.url.canonical, attribute, h[property])
           end
           h
         end
 
-        og['url'] = c18n(og['url'])
+        og['url'] = Url.new(og['url'])
 
         twitter = %w{url title description image}.inject({}) do |h, property|
           attribute = "twitter:#{property}"
           h[property] = extract_meta(html, attribute)
           if property != 'url'
-            h[property] = @memento.memorize(domain, url, attribute, h[property])
+            h[property] = @memento.memorize(response.url.domain, response.url.canonical, attribute, h[property])
           end
           h
         end
 
-        twitter['url'] = c18n(twitter['url'])
+        twitter['url'] = Url.new(twitter['url'])
 
         meta.merge!({
                         'url' => canonical,
@@ -55,7 +51,7 @@ module Linkly
                     })
 
         doc = Document.new
-        doc.url = find_url(url, meta, og, twitter)
+        doc.url = find_url(response.url, meta, og, twitter)
         doc.title = find_title(meta, og, twitter)
         doc.text = find_text(doc.title, meta, og, twitter)
         doc.image = find_image(meta, og, twitter)
@@ -68,8 +64,9 @@ module Linkly
 
       private
       def find_url(url, meta, og, twitter)
-        candidates = [url, meta['url'], og['url'], twitter['url']].compact.select { |url| url.to_s.start_with?('http') }
-        candidates.min_by { |url| url.size }
+        #p [url, meta, og, twitter]
+        candidates = [url, meta['url'], og['url'], twitter['url']].compact.select { |url| url.valid? }
+        candidates.min_by { |url| url.canonical.size }
       end
 
       def find_title(meta, og, twitter)
