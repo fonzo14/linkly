@@ -4,7 +4,7 @@ require 'spec_helper'
 module Linkly
   describe Url do
 
-    it "should not be valid if url does not start with http" do
+    it "should check the url validity" do
       Url.new("http://www.lemonde.fr/toto.html").valid?.should be_true
       Url.new("https://www.lemonde.fr/toto.html").valid?.should be_true
       Url.new("ftp://www.lemonde.fr/toto.html").valid?.should be_false
@@ -27,7 +27,7 @@ module Linkly
       u2.canonical.should eq u1.canonical
     end
 
-    it "should define an numeric ID" do
+    it "should define a numeric ID" do
       u1 = Url.new("http://www.lemonde.fr/toto.html")
       u1.id.should eq 151229629298312522934959243871111090804
 
@@ -56,6 +56,9 @@ module Linkly
         url = Url.new(u)
         url.url.should eq "http://www.lemonde.fr/toto.html"
       end
+
+      embedded_url = "http://news.google.com/news/url?sa=t&fd=R&usg=AFQjCNGSlY3LT2l2kmBu8SUqr3Y3QjSNVQ&url=http://www.metronews.fr/people/photos-24-heures-dans-la-vie-des-people/mmiy!Ypxj2OklaCXvg/"
+      Url.new(embedded_url).url.should eq "http://www.metronews.fr/people/photos-24-heures-dans-la-vie-des-people/mmiy!Ypxj2OklaCXvg"
     end
 
   end

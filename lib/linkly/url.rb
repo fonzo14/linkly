@@ -20,7 +20,7 @@ module Linkly
     end
 
     def canonical
-      @canonical ||= @url.to_s.downcase.gsub("//www.", "//").gsub("https:","http:")
+      @canonical ||= @url.downcase.gsub("//www.", "//").gsub("https:","http:")
     end
 
     def domain
@@ -45,6 +45,13 @@ module Linkly
 
       begin
         u = Addressable::URI.parse(url)
+
+        if u.query_values && embedded_url = u.query_values["url"]
+          p [:embedded, embedded_url]
+          if embedded_url.to_s.start_with?('http')
+            u = Addressable::URI.parse(embedded_url)
+          end
+        end
 
         if q = u.query_values(Array)
           q.delete_if { |k, v| C18N_[:global].include?(k) }
