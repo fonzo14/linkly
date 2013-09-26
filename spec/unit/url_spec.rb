@@ -97,6 +97,7 @@ module Linkly
       end
 
       p [collision, canonicals.size, count]
+      canonicals.size.should be > 30000
       collision.should eq 0
     end
 
