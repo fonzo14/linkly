@@ -12,7 +12,7 @@ module Linkly
     end
 
     def valid?
-      @url.start_with?('http') && ! ["127.0.0.1", "localhost", "0.0.0.0"].any? { |expr| @url.include?(expr) } && @url.size > 0
+      @url.size > 0 && @url.start_with?('http') && ! ["127.0.0.1", "localhost", "0.0.0.0"].any? { |expr| @url.include?(expr) }
     end
 
     def id
@@ -26,8 +26,7 @@ module Linkly
     def domain
       @domain ||= begin
         host = Addressable::URI.parse(url).host
-        elements = host.split('.')
-        host = ['www', *elements].join('.') if elements.size == 2
+        host.gsub!("www.","")
         host
       end
     end
@@ -47,7 +46,6 @@ module Linkly
         u = Addressable::URI.parse(url)
 
         if u.query_values && embedded_url = u.query_values["url"]
-          p [:embedded, embedded_url]
           if embedded_url.to_s.start_with?('http')
             u = Addressable::URI.parse(embedded_url)
           end

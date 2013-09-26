@@ -36,8 +36,10 @@ module Linkly
     end
 
     it "should return the domain" do
-      Url.new("http://www.lemonde.fr/toto.html").domain.should eq "www.lemonde.fr"
-      Url.new("https://lemonde.fr/toto.html").domain.should eq "www.lemonde.fr"
+      Url.new("http://www.lemonde.fr/toto.html").domain.should eq "lemonde.fr"
+      Url.new("https://lemonde.fr/toto.html").domain.should eq "lemonde.fr"
+      Url.new("https://www.theguardian.co.uk/toto.html").domain.should eq "theguardian.co.uk"
+      Url.new("https://theguardian.co.uk/toto.html").domain.should eq "theguardian.co.uk"
     end
 
     it "should c18n the url" do
