@@ -2,6 +2,7 @@ require "nokogiri"
 require "addressable/uri"
 require "yaml"
 require "digest/md5"
+require "digest/sha2"
 require "hotwater"
 require 'json'
 

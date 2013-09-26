@@ -10,6 +10,8 @@ module Linkly
       }.merge(opts)
       @original_url = url
 
+      @@sha ||= Digest::SHA2.new(256)
+
       @url = opts[:force] ? url.to_s : c18n(url).to_s
     end
 
@@ -18,7 +20,7 @@ module Linkly
     end
 
     def id
-      @id ||= Digest::MD5.hexdigest(canonical).to_i(16)
+      @id ||= @@sha.hexdigest(canonical).to_i(32)
     end
 
     def canonical
