@@ -2,12 +2,14 @@ module Linkly
   class Url
     include HTTP::Helper
 
-    attr_reader :url
+    attr_reader :url, :original_url
 
     def initialize(url, opts = {})
       opts = {
           :force => false
       }.merge(opts)
+      @original_url = url
+
       @url = opts[:force] ? url.to_s : c18n(url).to_s
     end
 
@@ -52,6 +54,8 @@ module Linkly
       return nil if url.to_s.empty?
 
       begin
+        url.chomp!
+
         u = Addressable::URI.parse(url)
 
         if u.query_values && embedded_url = u.query_values["url"]

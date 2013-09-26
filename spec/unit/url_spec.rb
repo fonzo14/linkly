@@ -14,6 +14,10 @@ module Linkly
       Url.new(nil).valid?.should be_false
     end
 
+    it "should return the original url" do
+      Url.new("http://www.lemonde.fr/toto.html#foo").original_url.should eq "http://www.lemonde.fr/toto.html#foo"
+    end
+
     it "should force the url" do
       Url.new("http://www.lemonde.fr:80/toto.html", :force => true).url.should eq "http://www.lemonde.fr:80/toto.html"
       Url.new("http://www.lemonde.fr:80/toto.html", :force => false).url.should eq "http://www.lemonde.fr/toto.html"
@@ -29,7 +33,7 @@ module Linkly
 
     it "should define the same numeric ID" do
       u1 = Url.new("http://www.lemonde.fr/toto.html")
-      u1.id.should eq 151229629298312522934959243871111090804
+      u1.id.should be_a_kind_of(Numeric)
 
       u2 = Url.new("https://lemonde.fr/toto.html")
       u2.id.should eq u1.id
@@ -71,6 +75,29 @@ module Linkly
       Url.new("", :force => true).handicap.should eq -5
       Url.new("http://feedproxy.com/toto.html", :force => true).handicap.should eq -2
       Url.new("http://feedfoo.com/toto.html", :force => true).handicap.should eq -1
+    end
+
+    it "should return an (almost unique ID) for the url's canonical" do
+      urls, count, collision = {}, 0, 0
+      canonicals = {}
+
+      IO.foreach(File.join(ROOT_SPEC, "unit", "uniq-urls.txt")).each do |u|
+        count += 1
+        url = Url.new(u)
+        id = url.id
+        unless canonicals.include?(url.canonical)
+          canonicals[url.canonical] = true
+          if urls.include?(id)
+            p [:collision, id, url.original_url, urls[id][0].original_url]
+            collision += 1
+          end
+          urls[id] ||= []
+          urls[id] << url
+        end
+      end
+
+      p [collision, canonicals.size, count]
+      collision.should eq 0
     end
 
   end
