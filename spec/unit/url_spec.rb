@@ -65,6 +65,8 @@ module Linkly
 
       embedded_url = "http://news.google.com/news/url?sa=t&fd=R&usg=AFQjCNGSlY3LT2l2kmBu8SUqr3Y3QjSNVQ&url=http://www.metronews.fr/people/photos-24-heures-dans-la-vie-des-people/mmiy!Ypxj2OklaCXvg/"
       Url.new(embedded_url).url.should eq "http://www.metronews.fr/people/photos-24-heures-dans-la-vie-des-people/mmiy!Ypxj2OklaCXvg"
+
+      Url.new("http://feedproxy.google.com/~r/Woork/~3/EyjdJihzUAQ").url.should eq "http://feedproxy.google.com/~r/Woork/~3/EyjdJihzUAQ"
     end
 
     it "should compute the url's handicap" do

@@ -2,7 +2,7 @@ require_relative "examples_helper"
 
 EM.synchrony do
   urls = %w(
-    http://www.lequipe.fr/Football/Actualites/Messi-polemique-avec-la-presse/403825
+    http://feedproxy.google.com/~r/Woork/~3/EyjdJihzUAQ
   )
 
   linkly = Linkly.new :cache => :null, :memento => :null
