@@ -27,7 +27,7 @@ module Linkly
       u2.canonical.should eq u1.canonical
     end
 
-    it "should define a numeric ID" do
+    it "should define the same numeric ID" do
       u1 = Url.new("http://www.lemonde.fr/toto.html")
       u1.id.should eq 151229629298312522934959243871111090804
 
@@ -61,6 +61,16 @@ module Linkly
 
       embedded_url = "http://news.google.com/news/url?sa=t&fd=R&usg=AFQjCNGSlY3LT2l2kmBu8SUqr3Y3QjSNVQ&url=http://www.metronews.fr/people/photos-24-heures-dans-la-vie-des-people/mmiy!Ypxj2OklaCXvg/"
       Url.new(embedded_url).url.should eq "http://www.metronews.fr/people/photos-24-heures-dans-la-vie-des-people/mmiy!Ypxj2OklaCXvg"
+    end
+
+    it "should compute the url's handicap" do
+      Url.new("http://www.lemonde.fr/toto.html", :force => true).handicap.should eq 0
+      Url.new("http://www.lemonde.fr/toto.html?q=foo", :force => true).handicap.should eq -1
+      Url.new("http://www.lemonde.fr/toto.html#foo", :force => true).handicap.should eq -1
+      Url.new("http://www.lemonde.fr/toto.html?q=foo#foo", :force => true).handicap.should eq -2
+      Url.new("", :force => true).handicap.should eq -5
+      Url.new("http://feedproxy.com/toto.html", :force => true).handicap.should eq -2
+      Url.new("http://feedfoo.com/toto.html", :force => true).handicap.should eq -1
     end
 
   end

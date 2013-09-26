@@ -64,9 +64,8 @@ module Linkly
 
       private
       def find_url(url, meta, og, twitter)
-        #p [url, meta, og, twitter]
         candidates = [url, meta['url'], og['url'], twitter['url']].compact.select { |url| url.valid? }
-        candidates.min_by { |url| url.canonical.size }
+        candidates.max_by { |url| url.handicap }
       end
 
       def find_title(meta, og, twitter)

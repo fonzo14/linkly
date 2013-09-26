@@ -31,6 +31,15 @@ module Linkly
       end
     end
 
+    def handicap
+      @handicap ||= begin
+        handicap = 0
+        handicap -= 5 unless valid?
+        %w(? # feed rss proxy).each { |car| handicap -= 1 if @url.include?(car) }
+        handicap
+      end
+    end
+
     private
     c18ndb_ = YAML.load_file(File.dirname(__FILE__) + '/c18n.yml')
 
