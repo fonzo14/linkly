@@ -4,11 +4,15 @@ module Linkly
     attr_accessor :image, :type, :platform, :url
 
     def title=(t)
-      @title = truncate(t.to_s, 255)
+      @title = truncate(t.to_s.strip, 255)
     end
 
     def text=(t)
-      @text = truncate(t.to_s, 400)
+      @text = truncate(t.to_s.strip, 400)
+    end
+
+    def valid?
+      title && !title.empty? && url && Linkly::Platform::ALL.include?(platform) && Linkly::DocumentType::ALL.include?(type)
     end
 
     def to_h

@@ -4,6 +4,8 @@ module Linkly
     BUILDERS = {
         /youtube\.com\/.*v=/ => Linkly::Builders::Youtube.new,
         /instagram\.com\/p\// => Linkly::Builders::Instagram.new,
+        /dailymotion\.com\/video\// => Linkly::Builders::Dailymotion.new,
+        /vine\.co\/v\// => Linkly::Builders::Vine.new,
     }.freeze
 
     def initialize(memento)
@@ -11,12 +13,13 @@ module Linkly
     end
 
     def build(response)
+      select_builder(response).build(response)
+    end
+
+    private
+    def select_builder(response)
       pattern = BUILDERS.keys.find { |r| response.url.url =~ r }
-
-      builder = pattern ? BUILDERS[pattern] : @generic
-
-      document = builder.build(response)
-      document
+      pattern ? BUILDERS[pattern] : @generic
     end
 
   end

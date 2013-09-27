@@ -32,7 +32,10 @@ module Linkly
           response = @http_client.get(url.url)
 
           if response.success?
-            document = @builder.build(response).to_h
+            doc = @builder.build(response)
+            if doc.valid?
+              document = doc.to_h
+            end
           else
            puts "#{response.code}: #{url.url}"
           end

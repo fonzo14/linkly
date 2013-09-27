@@ -1,6 +1,6 @@
 module Linkly
   module Builders
-    class Instagram < Abstract
+    class Dailymotion < Abstract
 
       def build(response)
         html = parse(response.url.url, response.body)
@@ -14,9 +14,11 @@ module Linkly
         doc = Document.new
         doc.url = Url.new(og['url'], :force => true)
         doc.image = og['image']
+        doc.title = to_text og['title']
+        doc.text = to_text og['description']
 
-        doc.type = Linkly::DocumentType::IMAGE
-        doc.platform = Linkly::Platform::INSTAGRAM
+        doc.type = Linkly::DocumentType::VIDEO
+        doc.platform = Linkly::Platform::DAILYMOTION
 
         doc
       end
